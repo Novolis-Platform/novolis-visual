@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.AssetStudio.Core</PackageId>
+    <RootNamespace>Novolis.AssetStudio.Core</RootNamespace>
+    <Description>Host-neutral immutable Asset Studio documents, commands, compilation coordination, previews, and graph projections.</Description>
+    <PackageTags>assetstudio;visual;authoring;headless;document;preview</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Definitions\Novolis.Visual.Definitions.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Compile\Novolis.Visual.Compile.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Evaluation\Novolis.Visual.Evaluation.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

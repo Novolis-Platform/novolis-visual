@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Novolis.Visual.GeneratedConsumer</RootNamespace>
+    <AssemblyName>Novolis.Visual.GeneratedConsumer</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="GeneratedSurfaceProgram.cs" />
+    <Compile Include="GeneratedImages.cs" />
+  </ItemGroup>
+</Project>

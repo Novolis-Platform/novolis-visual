@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.Adapters.Rendering</PackageId>
+    <RootNamespace>Novolis.Visual.Adapters.Rendering</RootNamespace>
+    <Description>Host-neutral VisualIR and evaluated-mesh adapters for Novolis Modeling and Rendering.</Description>
+    <PackageTags>visual;rendering;modeling;adapter;mesh;material;scene</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <LibraryReference Include="Novolis.Modeling.Scene" />
+    <LibraryReference Include="Novolis.Rendering.Appearance" />
+    <LibraryReference Include="Novolis.Rendering.Compile" />
+    <LibraryReference Include="Novolis.Rendering.FrameGraph" />
+    <LibraryReference Include="Novolis.Rendering.Materials" />
+    <LibraryReference Include="Novolis.Rendering.Runtime" />
+    <LibraryReference Include="Novolis.Rendering.Scene" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Definitions\Novolis.Visual.Definitions.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Compile\Novolis.Visual.Compile.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

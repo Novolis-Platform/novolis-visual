@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.Definitions</PackageId>
+    <RootNamespace>Novolis.Visual.Definitions</RootNamespace>
+    <Description>Immutable, host-neutral visual recipe contracts with typed values, ports, schema migration, and canonical fingerprints.</Description>
+    <PackageTags>visual;recipe;schema;asset;graph;canonical;deterministic</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

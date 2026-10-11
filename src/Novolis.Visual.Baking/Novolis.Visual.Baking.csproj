@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.Baking</PackageId>
+    <RootNamespace>Novolis.Visual.Baking</RootNamespace>
+    <Description>Deterministic CPU image, sprite, map, and manifest baking for VisualIR.</Description>
+    <PackageTags>visual;bake;image;sprite;atlas;deterministic</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Compile\Novolis.Visual.Compile.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Evaluation\Novolis.Visual.Evaluation.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

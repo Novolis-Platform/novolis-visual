@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Novolis.Visual.Definitions/Novolis.Visual.Definitions.csproj" />
+    <Project Path="src/Novolis.Visual.Compile/Novolis.Visual.Compile.csproj" />
+    <Project Path="src/Novolis.Visual.Adapters.Rendering/Novolis.Visual.Adapters.Rendering.csproj" />
+    <Project Path="src/Novolis.Visual.Evaluation/Novolis.Visual.Evaluation.csproj" />
+    <Project Path="src/Novolis.Visual.Baking/Novolis.Visual.Baking.csproj" />
+    <Project Path="src/Novolis.Visual.CodeGen/Novolis.Visual.CodeGen.csproj" />
+    <Project Path="src/Novolis.AssetStudio.Core/Novolis.AssetStudio.Core.csproj" />
+    <Project Path="src/Novolis.AssetStudio.Import/Novolis.AssetStudio.Import.csproj" />
+    <Project Path="src/Novolis.AssetStudio.Export/Novolis.AssetStudio.Export.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Novolis.Visual.Definitions.Unit/Novolis.Visual.Definitions.Unit.csproj" />
+    <Project Path="tests/Novolis.Visual.Compile.Unit/Novolis.Visual.Compile.Unit.csproj" />
+    <Project Path="tests/Novolis.Visual.Adapters.Rendering.Unit/Novolis.Visual.Adapters.Rendering.Unit.csproj" />
+    <Project Path="tests/Novolis.Visual.Evaluation.Unit/Novolis.Visual.Evaluation.Unit.csproj" />
+    <Project Path="tests/Novolis.Visual.Baking.Unit/Novolis.Visual.Baking.Unit.csproj" />
+    <Project Path="tests/Novolis.Visual.CodeGen.Unit/Novolis.Visual.CodeGen.Unit.csproj" />
+    <Project Path="tests/Novolis.Visual.GeneratedConsumer/Novolis.Visual.GeneratedConsumer.csproj" />
+    <Project Path="tests/Novolis.AssetStudio.Unit/Novolis.AssetStudio.Unit.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.CodeGen</PackageId>
+    <RootNamespace>Novolis.Visual.CodeGen</RootNamespace>
+    <Description>Deterministic readable C# generation and code-only closure verification for VisualIR.</Description>
+    <PackageTags>visual;codegen;csharp;embedded;manifest;closure</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Compile\Novolis.Visual.Compile.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

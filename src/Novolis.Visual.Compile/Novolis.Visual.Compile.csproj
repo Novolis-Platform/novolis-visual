@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.Compile</PackageId>
+    <RootNamespace>Novolis.Visual.Compile</RootNamespace>
+    <Description>Deterministic VisualIR compilation, optimization, capability negotiation, and source maps.</Description>
+    <PackageTags>visual;compile;ir;deterministic;capabilities</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Definitions\Novolis.Visual.Definitions.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

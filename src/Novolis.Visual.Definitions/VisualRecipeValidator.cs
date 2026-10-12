@@ -153,7 +153,12 @@ internal static class VisualRecipeValidator
                     connection.Id));
             }
 
-            if (!sourcePort.Contract.IsCompatibleWith(connection.SourceContract))
+            if (!sourcePort.Contract.IsCompatibleWith(connection.SourceContract) &&
+                !sourcePort.Contract.IsValueCompatibleWith(
+                    connection.SourceContract) &&
+                !IsLegacySourceContractCompatible(
+                    sourcePort.Contract,
+                    connection.SourceContract))
             {
                 diagnostics.Add(new(
                     VisualDiagnosticSeverity.Error,
@@ -205,6 +210,17 @@ internal static class VisualRecipeValidator
                 ConnectionId: connection.Id));
         }
     }
+
+    private static bool IsLegacySourceContractCompatible(
+        VisualTypeContract descriptor,
+        VisualTypeContract stored) =>
+        descriptor.ValueKind == stored.ValueKind &&
+        descriptor.Unit == stored.Unit &&
+        descriptor.ColorSpace == stored.ColorSpace &&
+        stored.CoordinateSpace == CoordinateSpace.None &&
+        stored.Frequency == FieldFrequency.Constant &&
+        stored.Purity == FieldPurity.Pure &&
+        stored.Attributes == VisualAttributeRequirement.None;
 
     private static void ValidateOutput(
         VisualOutput output,

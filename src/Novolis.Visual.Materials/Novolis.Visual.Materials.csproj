@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.Materials</PackageId>
+    <RootNamespace>Novolis.Visual.Materials</RootNamespace>
+    <Description>Reusable no-code material graphs, layers, parameter metadata, and instances.</Description>
+    <PackageTags>visual;materials;shader;nodes;pbr;glass;emission;instances</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Definitions\Novolis.Visual.Definitions.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

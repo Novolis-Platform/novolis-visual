@@ -13,7 +13,8 @@ public sealed record VisualNodeDescriptor
         string displayName,
         IEnumerable<VisualPortDescriptor>? ports = null,
         IEnumerable<VisualParameterDescriptor>? parameters = null,
-        VisualAttributeRequirement requiredAttributes = VisualAttributeRequirement.None)
+        VisualAttributeRequirement requiredAttributes = VisualAttributeRequirement.None,
+        VisualNodeEditorMetadata? editor = null)
     {
         TypeId = VisualValueValidation.Required(typeId, nameof(typeId));
         DisplayName = VisualValueValidation.Required(displayName, nameof(displayName));
@@ -27,6 +28,8 @@ public sealed record VisualNodeDescriptor
         Ports = CreatePorts(ports);
         Parameters = CreateParameters(parameters);
         RequiredAttributes = requiredAttributes;
+        Editor = editor ?? new VisualNodeEditorMetadata(
+            VisualNodeCategory.Advanced);
     }
 
     public string TypeId { get; }
@@ -40,6 +43,8 @@ public sealed record VisualNodeDescriptor
     public ImmutableArray<VisualParameterDescriptor> Parameters { get; }
 
     public VisualAttributeRequirement RequiredAttributes { get; }
+
+    public VisualNodeEditorMetadata Editor { get; }
 
     public VisualPortDescriptor? FindPort(PortId id) =>
         Ports.FirstOrDefault(port => port.Id == id);

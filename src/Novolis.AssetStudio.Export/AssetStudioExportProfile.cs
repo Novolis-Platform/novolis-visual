@@ -6,6 +6,9 @@ namespace Novolis.AssetStudio.Export;
 public enum AssetStudioExportProfile
 {
     Definition,
+    MaterialModule,
+    AssetPackage,
+    PreviewThumbnail,
     Code,
     Packed,
     Bake,

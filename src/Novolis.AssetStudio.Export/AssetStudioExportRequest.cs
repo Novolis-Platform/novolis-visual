@@ -1,4 +1,6 @@
 using Novolis.AssetStudio.Core;
+using Novolis.Visual.Assets;
+using Novolis.Visual.Materials;
 
 namespace Novolis.AssetStudio.Export;
 
@@ -13,12 +15,16 @@ public sealed record AssetStudioExportRequest
     public AssetStudioExportRequest(
         AssetStudioDocument document,
         AssetStudioExportProfile profile,
-        AssetStudioExportOptions? options = null)
+        AssetStudioExportOptions? options = null,
+        MaterialGraph? material = null,
+        AssetRecipe? asset = null)
     {
         ArgumentNullException.ThrowIfNull(document);
         Document = document;
         Profile = profile;
         Options = options ?? new AssetStudioExportOptions();
+        Material = material;
+        Asset = asset;
     }
 
     /// <summary>
@@ -35,4 +41,14 @@ public sealed record AssetStudioExportRequest
     /// Export options and bounds.
     /// </summary>
     public AssetStudioExportOptions Options { get; }
+
+    /// <summary>
+    /// Optional material module represented by this export.
+    /// </summary>
+    public MaterialGraph? Material { get; }
+
+    /// <summary>
+    /// Optional assembled asset represented by this export.
+    /// </summary>
+    public AssetRecipe? Asset { get; }
 }

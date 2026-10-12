@@ -21,28 +21,9 @@ public static class VisualCompiler
             VisualUnit.Unitless,
             CoordinateSpace.None,
             ColorSpace.LinearSrgb);
-        var vector = new VisualTypeContract(
-            VisualValueKind.Vector,
-            VisualUnit.Unitless,
-            CoordinateSpace.None,
-            ColorSpace.None);
-
         var descriptors = VisualNodeRegistry.CreateDefault().Descriptors
             .Concat(
             [
-                ConstantDescriptor(
-                    VisualCompileBuiltInNodeTypes.ConstantVector,
-                    "Vector constant",
-                    vector,
-                    VectorValue.Create3(0, 0, 0)),
-                BinaryDescriptor(
-                    VisualCompileBuiltInNodeTypes.MultiplyScalar,
-                    "Multiply scalars",
-                    scalar),
-                NoiseDescriptor(
-                    VisualCompileBuiltInNodeTypes.NoiseScalar,
-                    "Deterministic scalar noise",
-                    scalar),
                 BinaryDescriptor("multiply", "Multiply scalars", scalar),
                 BinaryDescriptor("mul", "Multiply scalars", scalar),
                 NoiseDescriptor("noise", "Deterministic scalar noise", scalar),
@@ -421,6 +402,11 @@ public static class VisualCompiler
         if (normalized == VisualBuiltInNodeTypes.ConstantColor)
         {
             return "constant.color";
+        }
+
+        if (normalized == VisualBuiltInNodeTypes.MaterialOutput)
+        {
+            return "material.output";
         }
 
         const string constantPrefix = "novolis.visual.constant.";

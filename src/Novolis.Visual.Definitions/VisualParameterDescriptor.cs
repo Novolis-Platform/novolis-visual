@@ -10,7 +10,8 @@ public sealed record VisualParameterDescriptor
         VisualTypeContract contract,
         VisualValue? defaultValue = null,
         bool isExposed = false,
-        string? description = null)
+        string? description = null,
+        VisualParameterEditorMetadata? editor = null)
     {
         Name = VisualValueValidation.Required(name, nameof(name));
         ArgumentNullException.ThrowIfNull(contract);
@@ -27,6 +28,9 @@ public sealed record VisualParameterDescriptor
         DefaultValue = defaultValue;
         IsExposed = isExposed;
         Description = description;
+        Editor = editor ?? new VisualParameterEditorMetadata(
+            displayName: name,
+            description: description);
     }
 
     public string Name { get; }
@@ -38,4 +42,6 @@ public sealed record VisualParameterDescriptor
     public bool IsExposed { get; }
 
     public string? Description { get; }
+
+    public VisualParameterEditorMetadata Editor { get; }
 }

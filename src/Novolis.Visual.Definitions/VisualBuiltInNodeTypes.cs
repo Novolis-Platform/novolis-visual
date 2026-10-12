@@ -9,7 +9,19 @@ public static class VisualBuiltInNodeTypes
 
     public const string ConstantColor = "novolis.visual.constant.color";
 
+    public const string ConstantVector = "novolis.visual.constant.vector";
+
+    public const string ConstantMaterial = "novolis.visual.constant.material";
+
+    public const string ConstantGeometry = "novolis.visual.constant.geometry";
+
     public const string AddScalar = "novolis.visual.math.add";
+
+    public const string MultiplyScalar = "novolis.visual.math.multiply";
+
+    public const string NoiseScalar = "novolis.visual.math.noise";
+
+    public const string MaterialOutput = "novolis.visual.material.output";
 
     public const string FrameOutput = "novolis.visual.output.frame";
 

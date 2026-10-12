@@ -1,6 +1,9 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Novolis.Visual.Definitions/Novolis.Visual.Definitions.csproj" />
+    <Project Path="src/Novolis.Visual.Materials/Novolis.Visual.Materials.csproj" />
+    <Project Path="src/Novolis.Visual.Assets/Novolis.Visual.Assets.csproj" />
+    <Project Path="src/Novolis.Visual.Presets/Novolis.Visual.Presets.csproj" />
     <Project Path="src/Novolis.Visual.Compile/Novolis.Visual.Compile.csproj" />
     <Project Path="src/Novolis.Visual.Adapters.Rendering/Novolis.Visual.Adapters.Rendering.csproj" />
     <Project Path="src/Novolis.Visual.Evaluation/Novolis.Visual.Evaluation.csproj" />

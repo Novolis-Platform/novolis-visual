@@ -131,6 +131,230 @@ public static class RenderingMaterialAdapter
     }
 
     /// <summary>
+    /// Lowers a channelized material value to the closest existing renderer
+    /// material while reporting every channel that cannot be represented.
+    /// </summary>
+    public static RenderingMaterialResult LowerMaterial(
+        MaterialValue material,
+        RenderingAdapterOptions? options = null,
+        string? sourcePath = null)
+    {
+        ArgumentNullException.ThrowIfNull(material);
+        var effectiveOptions = options ?? RenderingAdapterOptions.Default;
+        var fingerprint = RenderingAdapterFingerprint.ForMaterialValue(material);
+        var capabilities = new RenderingAdapterCapabilityBuilder();
+        var diagnostics = new List<VisualRenderingDiagnostic>();
+        var target = effectiveOptions.TargetCapabilities.GetSupport(
+            RenderingAdapterContract.MaterialAuthoringCapability);
+        var targetStatus = ResolveTargetStatus(
+            target,
+            RenderingAdapterContract.MaterialAuthoringCapability,
+            sourcePath,
+            diagnostics);
+        capabilities.Add(
+            RenderingAdapterContract.MaterialAuthoringCapability,
+            targetStatus,
+            target.Message);
+
+        if (targetStatus == VisualCapabilityStatus.Unsupported)
+        {
+            return CreateResult(
+                null,
+                null,
+                targetStatus,
+                diagnostics,
+                capabilities,
+                fingerprint,
+                sourcePath);
+        }
+
+        if (!TryConvertColor(
+                material.BaseColor,
+                out var baseColor,
+                out var baseColorMessage))
+        {
+            diagnostics.Add(
+                RenderingAdapterDiagnostics.Error(
+                    "VRA250",
+                    baseColorMessage,
+                    sourcePath,
+                    RenderingAdapterContract.MaterialAuthoringCapability));
+            return CreateResult(
+                null,
+                null,
+                VisualCapabilityStatus.Unsupported,
+                diagnostics,
+                capabilities,
+                fingerprint,
+                sourcePath);
+        }
+
+        if (!TryConvertColor(
+                material.EmissionColor,
+                out var emissionColor,
+                out var emissionMessage))
+        {
+            diagnostics.Add(
+                RenderingAdapterDiagnostics.Error(
+                    "VRA250",
+                    emissionMessage,
+                    sourcePath,
+                    RenderingAdapterContract.MaterialAuthoringCapability));
+            return CreateResult(
+                null,
+                null,
+                VisualCapabilityStatus.Unsupported,
+                diagnostics,
+                capabilities,
+                fingerprint,
+                sourcePath);
+        }
+
+        if (material.Transmission > 0)
+        {
+            var transmissionSupport =
+                effectiveOptions.TargetCapabilities.GetSupport(
+                    RenderingAdapterContract.MaterialTransmissionCapability);
+            capabilities.Add(
+                RenderingAdapterContract.MaterialTransmissionCapability,
+                transmissionSupport.Status,
+                transmissionSupport.Message);
+            const string message =
+                "The selected target cannot represent material transmission.";
+            if (transmissionSupport.Status == VisualCapabilityStatus.Unsupported)
+            {
+                diagnostics.Add(
+                    RenderingAdapterDiagnostics.Error(
+                        "VRA251",
+                        message,
+                        sourcePath,
+                        RenderingAdapterContract.MaterialTransmissionCapability));
+                return CreateResult(
+                    null,
+                    null,
+                    VisualCapabilityStatus.Unsupported,
+                    diagnostics,
+                    capabilities,
+                    fingerprint,
+                    sourcePath);
+            }
+        }
+
+        if (material.EmissionStrength > 0)
+        {
+            var emissionSupport = effectiveOptions.TargetCapabilities.GetSupport(
+                RenderingAdapterContract.MaterialEmissionCapability);
+            capabilities.Add(
+                RenderingAdapterContract.MaterialEmissionCapability,
+                emissionSupport.Status,
+                emissionSupport.Message);
+            if (emissionSupport.Status == VisualCapabilityStatus.Unsupported)
+            {
+                diagnostics.Add(
+                    RenderingAdapterDiagnostics.Warning(
+                        "VRA252",
+                        "The selected target will omit material emission.",
+                        sourcePath,
+                        RenderingAdapterContract.MaterialEmissionCapability));
+            }
+        }
+
+        IMaterial lowered;
+        SurfaceSample? sample = null;
+        if (material.Transmission > 0 ||
+            material.Model == VisualMaterialModel.Glass)
+        {
+            lowered = new GlassMaterial
+            {
+                Tint = baseColor,
+                Roughness = (float)material.Roughness,
+                Ior = (float)material.Ior,
+                Absorption = (float)material.Absorption,
+            };
+        }
+        else if (material.Model == VisualMaterialModel.Emissive &&
+                 material.Metallic == 0)
+        {
+            lowered = new EmissiveMaterial
+            {
+                EmissionColor = emissionColor,
+                EmissionStrength = (float)material.EmissionStrength,
+            };
+        }
+        else
+        {
+            lowered = new StandardMaterial
+            {
+                BaseColor = baseColor,
+                Roughness = (float)material.Roughness,
+                Metallic = (float)material.Metallic,
+                EmissionColor = emissionColor,
+                EmissionStrength = (float)material.EmissionStrength,
+            };
+            sample = new SurfaceSample(
+                ToRgba(material.BaseColor),
+                (float)material.Roughness,
+                (float)material.Metallic,
+                ToRgba(material.EmissionColor),
+                (float)material.Alpha);
+        }
+
+        var status = targetStatus;
+        if (material.Clearcoat > 0 ||
+            System.Math.Abs(material.Anisotropy) > 0)
+        {
+            status = status == VisualCapabilityStatus.Exact
+                ? VisualCapabilityStatus.Approximate
+                : status;
+            diagnostics.Add(
+                RenderingAdapterDiagnostics.Warning(
+                    "VRA253",
+                    "Clearcoat and anisotropy are approximated by the current material contracts.",
+                    sourcePath,
+                    RenderingAdapterContract.MaterialAuthoringCapability));
+        }
+
+        if (material.Alpha < 1)
+        {
+            status = effectiveOptions.AllowBakedFallback
+                ? VisualCapabilityStatus.BakedFallback
+                : VisualCapabilityStatus.Unsupported;
+            diagnostics.Add(
+                status == VisualCapabilityStatus.BakedFallback
+                    ? RenderingAdapterDiagnostics.Warning(
+                        "VRA254",
+                        "Material alpha requires an explicit transparency bake.",
+                        sourcePath,
+                        RenderingAdapterContract.MaterialAuthoringCapability)
+                    : RenderingAdapterDiagnostics.Error(
+                        "VRA255",
+                        "Material alpha requires a transparency-capable target.",
+                        sourcePath,
+                        RenderingAdapterContract.MaterialAuthoringCapability));
+            if (status == VisualCapabilityStatus.Unsupported)
+            {
+                return CreateResult(
+                    null,
+                    sample,
+                    status,
+                    diagnostics,
+                    capabilities,
+                    fingerprint,
+                    sourcePath);
+            }
+        }
+
+        return CreateResult(
+            lowered,
+            sample,
+            status,
+            diagnostics,
+            capabilities,
+            fingerprint,
+            sourcePath);
+    }
+
+    /// <summary>
     /// Lowers an existing appearance stack when all operations have fixed
     /// material equivalents. Procedural operations report Unsupported or
     /// BakedFallback; they are not sampled into a fixed material.
@@ -541,4 +765,23 @@ public static class RenderingMaterialAdapter
 
     private static Vector3 ToVector(Novolis.Math.Geometry.Rgba32 color) =>
         new(color.R / 255f, color.G / 255f, color.B / 255f);
+
+    private static Novolis.Math.Geometry.Rgba32 ToRgba(ColorValue color) =>
+        new(
+            (byte)System.Math.Clamp(
+                (int)System.Math.Round(color.Red * 255d),
+                0,
+                255),
+            (byte)System.Math.Clamp(
+                (int)System.Math.Round(color.Green * 255d),
+                0,
+                255),
+            (byte)System.Math.Clamp(
+                (int)System.Math.Round(color.Blue * 255d),
+                0,
+                255),
+            (byte)System.Math.Clamp(
+                (int)System.Math.Round(color.Alpha * 255d),
+                0,
+                255));
 }

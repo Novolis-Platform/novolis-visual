@@ -5,6 +5,8 @@ using Novolis.Visual.Baking;
 using Novolis.Visual.CodeGen;
 using Novolis.Visual.Compile;
 using Novolis.Visual.Definitions;
+using Novolis.Visual.Assets;
+using Novolis.Visual.Materials;
 
 namespace Novolis.AssetStudio.Export;
 
@@ -44,7 +46,9 @@ public sealed class AssetStudioExporter
             AssetStudioExportProfile.Code or
             AssetStudioExportProfile.Bake or
             AssetStudioExportProfile.Build or
-            AssetStudioExportProfile.Packed;
+            AssetStudioExportProfile.Packed or
+            AssetStudioExportProfile.AssetPackage or
+            AssetStudioExportProfile.PreviewThumbnail;
         if (compileProfile)
         {
             compilation = VisualCompiler.Compile(recipe);
@@ -64,6 +68,41 @@ public sealed class AssetStudioExporter
                     "application/json",
                     AssetStudioDocumentPersistence.ToCanonicalJson(
                         request.Document));
+                break;
+
+            case AssetStudioExportProfile.MaterialModule:
+                AddTextArtifact(
+                    artifacts,
+                    "material/recipe.json",
+                    "application/json",
+                    request.Material is { } material
+                        ? MaterialGraphSerializer.Serialize(material)
+                        : AssetStudioDocumentPersistence.ToCanonicalJson(
+                            request.Document));
+                break;
+
+            case AssetStudioExportProfile.AssetPackage:
+                if (request.Asset is { } asset)
+                {
+                    AddTextArtifact(
+                        artifacts,
+                        "asset/asset.json",
+                        "application/json",
+                        AssetRecipeSerializer.Serialize(asset));
+                }
+                else if (compilation is not null && compilation.Success)
+                {
+                    AddPackedArtifact(artifacts, request.Document, options);
+                }
+
+                break;
+
+            case AssetStudioExportProfile.PreviewThumbnail:
+                if (compilation is not null && compilation.Success)
+                {
+                    AddBakeArtifacts(artifacts, compilation, options);
+                }
+
                 break;
 
             case AssetStudioExportProfile.Code:

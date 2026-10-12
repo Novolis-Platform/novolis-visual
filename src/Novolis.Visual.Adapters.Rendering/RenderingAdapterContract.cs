@@ -27,6 +27,24 @@ public static class RenderingAdapterContract
         "rendering.appearance.constant-surface.v1";
 
     /// <summary>
+    /// Capability for a channelized material lowered to an IMaterial.
+    /// </summary>
+    public const string MaterialAuthoringCapability =
+        "rendering.material.authoring.v2";
+
+    /// <summary>
+    /// Capability for transmission/refraction material lowering.
+    /// </summary>
+    public const string MaterialTransmissionCapability =
+        "rendering.material.transmission.v1";
+
+    /// <summary>
+    /// Capability for emission material lowering.
+    /// </summary>
+    public const string MaterialEmissionCapability =
+        "rendering.material.emission.v1";
+
+    /// <summary>
     /// Capability for a procedural appearance stack that needs a bake.
     /// </summary>
     public const string AppearanceBakeCapability = "rendering.appearance.bake.v1";

@@ -30,6 +30,11 @@ internal static class VisualValueJson
                 writer.WriteBoolean("value", boolean.Value);
                 break;
 
+            case TextValue text:
+                writer.WriteString("kind", text.Kind.ToString());
+                writer.WriteString("value", text.Value);
+                break;
+
             case ColorValue color:
                 writer.WriteNumber("alpha", color.Alpha);
                 writer.WriteNumber("blue", color.Blue);
@@ -79,6 +84,26 @@ internal static class VisualValueJson
                 writer.WriteString("materialId", surface.MaterialId);
                 writer.WriteNumber("metallic", surface.Metallic);
                 writer.WriteNumber("roughness", surface.Roughness);
+                break;
+
+            case MaterialValue material:
+                writer.WriteNumber("absorption", material.Absorption);
+                writer.WriteNumber("alpha", material.Alpha);
+                writer.WriteNumber("anisotropy", material.Anisotropy);
+                writer.WritePropertyName("baseColor");
+                WriteValue(writer, material.BaseColor);
+                writer.WriteNumber("clearcoat", material.Clearcoat);
+                writer.WriteNumber("emissionStrength", material.EmissionStrength);
+                writer.WritePropertyName("emissionColor");
+                WriteValue(writer, material.EmissionColor);
+                writer.WriteString("kind", material.Kind.ToString());
+                writer.WriteString("materialId", material.MaterialId);
+                writer.WriteString("model", material.Model.ToString());
+                writer.WriteNumber("metallic", material.Metallic);
+                writer.WriteNumber("ior", material.Ior);
+                writer.WriteNumber("roughness", material.Roughness);
+                writer.WriteBoolean("thinWall", material.ThinWall);
+                writer.WriteNumber("transmission", material.Transmission);
                 break;
 
             case LightValue light:
@@ -205,6 +230,8 @@ internal static class VisualValueJson
                 ParseEnum<VisualUnit>(Required(element, "unit"), "unit")),
             VisualValueKind.Boolean => new BooleanValue(
                 Required(element, "value").GetBoolean()),
+            VisualValueKind.Text => new TextValue(
+                Required(element, "value").GetString() ?? string.Empty),
             VisualValueKind.Color => ParseColor(element),
             VisualValueKind.Vector => ParseVector(element),
             VisualValueKind.Transform => ParseTransform(element),
@@ -233,6 +260,23 @@ internal static class VisualValueJson
                 ParseColorValue(Required(element, "baseColor")),
                 Required(element, "roughness").GetDouble(),
                 Required(element, "metallic").GetDouble()),
+            VisualValueKind.Material => new MaterialValue(
+                Required(element, "materialId").GetString() ?? string.Empty,
+                ParseEnum<VisualMaterialModel>(
+                    Required(element, "model"),
+                    "model"),
+                ParseColorValue(Required(element, "baseColor")),
+                Required(element, "roughness").GetDouble(),
+                Required(element, "metallic").GetDouble(),
+                ParseColorValue(Required(element, "emissionColor")),
+                Required(element, "emissionStrength").GetDouble(),
+                Required(element, "transmission").GetDouble(),
+                Required(element, "ior").GetDouble(),
+                Required(element, "absorption").GetDouble(),
+                Required(element, "clearcoat").GetDouble(),
+                Required(element, "anisotropy").GetDouble(),
+                Required(element, "alpha").GetDouble(),
+                Required(element, "thinWall").GetBoolean()),
             VisualValueKind.Light => new LightValue(
                 ParseEnum<LightKind>(Required(element, "lightKind"), "lightKind"),
                 ParseColorValue(Required(element, "color")),

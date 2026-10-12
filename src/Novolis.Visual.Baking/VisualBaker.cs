@@ -151,6 +151,29 @@ public sealed class VisualBaker
                 ToByte((float)color.Alpha));
         }
 
+        if (value is MaterialValue material)
+        {
+            var materialColor = target switch
+            {
+                VisualBakeTarget.EmissionMap => new ColorValue(
+                    material.EmissionColor.Red * material.EmissionStrength,
+                    material.EmissionColor.Green * material.EmissionStrength,
+                    material.EmissionColor.Blue * material.EmissionStrength,
+                    1),
+                VisualBakeTarget.RoughnessMap => new ColorValue(
+                    material.Roughness,
+                    material.Roughness,
+                    material.Roughness,
+                    1),
+                _ => material.BaseColor,
+            };
+            return new VisualRgba32(
+                ToByte((float)materialColor.Red),
+                ToByte((float)materialColor.Green),
+                ToByte((float)materialColor.Blue),
+                ToByte((float)materialColor.Alpha));
+        }
+
         if (value is VectorValue vector && vector.Components.Length >= 3)
         {
             var red = vector.Components[0];

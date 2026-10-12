@@ -99,6 +99,56 @@ public static class VisualRecipeSerializer
         return Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Serializes one typed visual value using the canonical value contract.
+    /// </summary>
+    public static string SerializeValue(VisualValue value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream))
+        {
+            VisualValueJson.WriteValue(writer, value);
+        }
+
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    /// <summary>
+    /// Reads one typed visual value from canonical value JSON.
+    /// </summary>
+    public static VisualValue DeserializeValue(string json)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+        using var document = JsonDocument.Parse(json);
+        return VisualValueJson.ParseValue(document.RootElement);
+    }
+
+    /// <summary>
+    /// Serializes one port or parameter contract.
+    /// </summary>
+    public static string SerializeContract(VisualTypeContract contract)
+    {
+        ArgumentNullException.ThrowIfNull(contract);
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream))
+        {
+            VisualValueJson.WriteContract(writer, contract);
+        }
+
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    /// <summary>
+    /// Reads one port or parameter contract from canonical JSON.
+    /// </summary>
+    public static VisualTypeContract DeserializeContract(string json)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+        using var document = JsonDocument.Parse(json);
+        return VisualValueJson.ParseContract(document.RootElement);
+    }
+
     public static VisualRecipe Deserialize(
         string json,
         VisualNodeRegistry? registry = null,

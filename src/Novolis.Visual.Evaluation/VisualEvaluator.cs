@@ -166,8 +166,68 @@ public static class VisualEvaluator
                 node,
                 diagnostics),
             "noise.scalar" => Noise(context),
+            "material.output" => MaterialOutput(inputs, node, diagnostics),
             _ => Unknown(node, diagnostics),
         };
+    }
+
+    private static VisualValue MaterialOutput(
+        IReadOnlyDictionary<string, VisualValue> inputs,
+        VisualIRNode node,
+        ICollection<VisualDiagnostic> diagnostics)
+    {
+        var baseColor = ReadColor(
+            inputs,
+            "baseColor",
+            new ColorValue(0.75, 0.75, 0.78));
+        var emissionColor = ReadColor(
+            inputs,
+            "emissionColor",
+            new ColorValue(0, 0, 0));
+        var roughness = ReadScalar(inputs, "roughness", 0.5);
+        var metallic = ReadScalar(inputs, "metallic", 0);
+        var emissionStrength = ReadScalar(inputs, "emissionStrength", 0);
+        var transmission = ReadScalar(inputs, "transmission", 0);
+        var ior = Math.Max(1, ReadScalar(inputs, "ior", 1.5));
+        var absorption = Math.Max(0, ReadScalar(inputs, "absorption", 0));
+        var clearcoat = ReadScalar(inputs, "clearcoat", 0);
+        var anisotropy = Math.Clamp(ReadScalar(inputs, "anisotropy", 0), -1, 1);
+        var alpha = Math.Clamp(ReadScalar(inputs, "alpha", 1), 0, 1);
+        var model = transmission > 0.001
+            ? VisualMaterialModel.Glass
+            : emissionStrength > 0.001 && metallic < 0.001
+                ? VisualMaterialModel.Emissive
+                : VisualMaterialModel.StandardPbr;
+
+        try
+        {
+            return new MaterialValue(
+                "visual.material.output",
+                model,
+                baseColor,
+                roughness,
+                metallic,
+                emissionColor,
+                emissionStrength,
+                transmission,
+                ior,
+                absorption,
+                clearcoat,
+                anisotropy,
+                alpha);
+        }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            diagnostics.Add(new(
+                VisualDiagnosticSeverity.Error,
+                "EVAL030",
+                $"Material output contains an invalid value: {exception.ParamName}.",
+                node.Id));
+            return new MaterialValue(
+                "visual.material.invalid",
+                VisualMaterialModel.StandardPbr,
+                new ColorValue(0.5, 0.5, 0.5));
+        }
     }
 
     private static VisualValue Add(
@@ -317,6 +377,22 @@ public static class VisualEvaluator
             ?? new ScalarValue(0);
     }
 
+    private static double ReadScalar(
+        IReadOnlyDictionary<string, VisualValue> inputs,
+        string name,
+        double fallback) =>
+        inputs.TryGetValue(name, out var value) && value is ScalarValue scalar
+            ? scalar.Value
+            : fallback;
+
+    private static ColorValue ReadColor(
+        IReadOnlyDictionary<string, VisualValue> inputs,
+        string name,
+        ColorValue fallback) =>
+        inputs.TryGetValue(name, out var value) && value is ColorValue color
+            ? color
+            : fallback;
+
     private static VisualValue DefaultValue(VisualTypeContract contract) =>
         contract.ValueKind switch
         {
@@ -336,6 +412,11 @@ public static class VisualEvaluator
                 contract.CoordinateSpace),
             VisualValueKind.Integer => new IntegerValue(0, contract.Unit),
             VisualValueKind.Boolean => new BooleanValue(false),
+            VisualValueKind.Text => new TextValue(string.Empty),
+            VisualValueKind.Material => new MaterialValue(
+                "visual.material.default",
+                VisualMaterialModel.StandardPbr,
+                new ColorValue(0.75, 0.75, 0.78)),
             _ => new ScalarValue(contract.Unit == VisualUnit.Unitless ? 0 : 0, contract.Unit),
         };
 }

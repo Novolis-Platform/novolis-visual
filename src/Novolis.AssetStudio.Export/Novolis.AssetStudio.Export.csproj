@@ -12,9 +12,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Novolis.AssetStudio.Core\Novolis.AssetStudio.Core.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Assets\Novolis.Visual.Assets.csproj" />
     <ProjectReference Include="..\Novolis.Visual.Compile\Novolis.Visual.Compile.csproj" />
     <ProjectReference Include="..\Novolis.Visual.Baking\Novolis.Visual.Baking.csproj" />
     <ProjectReference Include="..\Novolis.Visual.CodeGen\Novolis.Visual.CodeGen.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Materials\Novolis.Visual.Materials.csproj" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

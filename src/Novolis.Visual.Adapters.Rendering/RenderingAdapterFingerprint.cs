@@ -55,6 +55,37 @@ public static class RenderingAdapterFingerprint
     }
 
     /// <summary>
+    /// Computes an identity for a channelized Visual material.
+    /// </summary>
+    public static string ForMaterialValue(MaterialValue material)
+    {
+        ArgumentNullException.ThrowIfNull(material);
+
+        var builder = new StringBuilder();
+        Append(builder, "contract", RenderingAdapterContract.Version);
+        Append(builder, "kind", "material-value");
+        Append(builder, "material-id", material.MaterialId);
+        Append(builder, "model", material.Model);
+        Append(builder, "base-r", material.BaseColor.Red);
+        Append(builder, "base-g", material.BaseColor.Green);
+        Append(builder, "base-b", material.BaseColor.Blue);
+        Append(builder, "roughness", material.Roughness);
+        Append(builder, "metallic", material.Metallic);
+        Append(builder, "emission-r", material.EmissionColor.Red);
+        Append(builder, "emission-g", material.EmissionColor.Green);
+        Append(builder, "emission-b", material.EmissionColor.Blue);
+        Append(builder, "emission-strength", material.EmissionStrength);
+        Append(builder, "transmission", material.Transmission);
+        Append(builder, "ior", material.Ior);
+        Append(builder, "absorption", material.Absorption);
+        Append(builder, "clearcoat", material.Clearcoat);
+        Append(builder, "anisotropy", material.Anisotropy);
+        Append(builder, "alpha", material.Alpha);
+        Append(builder, "thin-wall", material.ThinWall);
+        return Hash(builder);
+    }
+
+    /// <summary>
     /// Computes an identity for an ordered appearance stack.
     /// </summary>
     public static string ForAppearance(AppearanceStack stack)

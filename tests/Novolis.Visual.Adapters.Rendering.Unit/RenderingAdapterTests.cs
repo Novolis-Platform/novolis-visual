@@ -94,6 +94,31 @@ public sealed class RenderingAdapterTests
     }
 
     [Test]
+    public async Task Channelized_glass_lowers_to_glass_material_with_transmission()
+    {
+        var glass = new MaterialValue(
+            "glass",
+            VisualMaterialModel.Glass,
+            new ColorValue(0.9, 0.98, 1),
+            roughness: 0.04,
+            metallic: 0,
+            emissionColor: new ColorValue(0, 0, 0),
+            emissionStrength: 0,
+            transmission: 1,
+            ior: 1.5,
+            absorption: 0.04);
+
+        var lowered = RenderingMaterialAdapter.LowerMaterial(glass);
+
+        await Assert.That(lowered.Status)
+            .IsEqualTo(VisualCapabilityStatus.Exact);
+        await Assert.That(lowered.Material)
+            .IsTypeOf<GlassMaterial>();
+        await Assert.That(lowered.Capabilities.Results.Select(result => result.Id))
+            .Contains(RenderingAdapterContract.MaterialTransmissionCapability);
+    }
+
+    [Test]
     public async Task Constant_appearance_stack_uses_reference_evaluator()
     {
         var stack = AppearanceStack.GreySurface()

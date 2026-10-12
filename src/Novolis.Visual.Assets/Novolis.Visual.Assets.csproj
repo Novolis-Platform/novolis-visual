@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Novolis.Visual.Assets</PackageId>
+    <RootNamespace>Novolis.Visual.Assets</RootNamespace>
+    <Description>Reusable no-code procedural asset assemblies, material slots, templates, and instances.</Description>
+    <PackageTags>visual;assets;geometry;procedural;scene;templates;instances</PackageTags>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Novolis.Visual.Definitions\Novolis.Visual.Definitions.csproj" />
+    <ProjectReference Include="..\Novolis.Visual.Materials\Novolis.Visual.Materials.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

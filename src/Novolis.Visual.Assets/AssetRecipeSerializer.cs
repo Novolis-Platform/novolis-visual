@@ -9,7 +9,7 @@ namespace Novolis.Visual.Assets;
 /// </summary>
 public static class AssetRecipeSerializer
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
 
     public static string Serialize(AssetRecipe asset)
     {
@@ -28,11 +28,18 @@ public static class AssetRecipeSerializer
                 writer.WriteString("materialSlotId", component.MaterialSlotId);
                 writer.WriteString("name", component.Name);
                 WritePort(writer, component.Source);
+                if (component.Geometry is { } geometry)
+                {
+                    writer.WritePropertyName("geometry");
+                    WriteGeometry(writer, geometry);
+                }
+
                 writer.WriteEndObject();
             }
 
             writer.WriteEndArray();
             writer.WriteString("displayName", asset.DisplayName);
+            writer.WriteNumber("moduleVersion", asset.ModuleVersion);
             writer.WritePropertyName("graph");
             WriteRaw(writer, VisualRecipeSerializer.Serialize(asset.Graph));
             writer.WriteStartArray("materialSlots");
@@ -55,6 +62,17 @@ public static class AssetRecipeSerializer
 
             writer.WriteEndArray();
             writer.WriteNumber("schemaVersion", CurrentSchemaVersion);
+            writer.WriteStartArray("dependencies");
+            foreach (var dependency in asset.Dependencies)
+            {
+                writer.WriteStartObject();
+                writer.WriteString("algorithm", dependency.Algorithm);
+                writer.WriteString("fingerprint", dependency.Fingerprint);
+                writer.WriteString("id", dependency.Id);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
             writer.WriteStartArray("tags");
             foreach (var tag in asset.Tags)
             {
@@ -76,10 +94,10 @@ public static class AssetRecipeSerializer
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
         var version = Required(root, "schemaVersion").GetInt32();
-        if (version != CurrentSchemaVersion)
+        if (version is not 1 and not CurrentSchemaVersion)
         {
             throw new JsonException(
-                $"Expected asset schema version {CurrentSchemaVersion}, got {version}.");
+                $"Expected asset schema version 1 or {CurrentSchemaVersion}, got {version}.");
         }
 
         return new AssetRecipe(
@@ -93,7 +111,11 @@ public static class AssetRecipeSerializer
             ParseParameters(OptionalArray(root, "parameters")),
             OptionalArray(root, "tags")
                 .EnumerateArray()
-                .Select(element => element.GetString() ?? string.Empty));
+                .Select(element => element.GetString() ?? string.Empty),
+            root.TryGetProperty("moduleVersion", out var moduleVersion)
+                ? moduleVersion.GetInt32()
+                : 1,
+            ParseDependencies(OptionalArray(root, "dependencies")));
     }
 
     public static string SerializeInstance(AssetInstance instance)
@@ -131,10 +153,10 @@ public static class AssetRecipeSerializer
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
         var version = Required(root, "schemaVersion").GetInt32();
-        if (version != CurrentSchemaVersion)
+        if (version is not 1 and not CurrentSchemaVersion)
         {
             throw new JsonException(
-                $"Expected asset schema version {CurrentSchemaVersion}, got {version}.");
+                $"Expected asset schema version 1 or {CurrentSchemaVersion}, got {version}.");
         }
 
         var parentId = RequiredString(root, "assetId");
@@ -168,8 +190,153 @@ public static class AssetRecipeSerializer
                     Required(element, "kind"),
                     "kind"),
                 ParsePort(element),
-                OptionalString(element, "materialSlotId"));
+                OptionalString(element, "materialSlotId"),
+                element.TryGetProperty("geometry", out var geometry)
+                    ? ParseGeometry(geometry)
+                    : null);
         }
+    }
+
+    private static AssetGeometryDefinition ParseGeometry(JsonElement element)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            throw new JsonException("Property 'geometry' must be an object.");
+        }
+
+        var size = OptionalArray(element, "size")
+            .EnumerateArray()
+            .Select(value => value.GetDouble());
+        var position = OptionalArray(element, "position")
+            .EnumerateArray()
+            .Select(value => value.GetDouble());
+        var rotation = OptionalArray(element, "rotationDegrees")
+            .EnumerateArray()
+            .Select(value => value.GetDouble());
+        var repeat = element.TryGetProperty("repeat", out var repeatElement)
+            ? ParseRepeat(repeatElement)
+            : null;
+
+        return new AssetGeometryDefinition(
+            RequiredString(element, "geometryId"),
+            ParseEnum<AssetGeometryPrimitive>(
+                Required(element, "primitive"),
+                "primitive"),
+            size,
+            position,
+            rotation,
+            Required(element, "segments").GetInt32(),
+            ParseBindings(OptionalArray(element, "sizeBindings")),
+            ParseBindings(OptionalArray(element, "positionBindings")),
+            repeat,
+            OptionalString(element, "textParameterId"),
+            OptionalString(element, "textSpacingParameterId"));
+    }
+
+    private static AssetGeometryRepeat ParseRepeat(JsonElement element)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            throw new JsonException("Property 'repeat' must be an object.");
+        }
+
+        return new AssetGeometryRepeat(
+            Required(element, "fixedCount").GetInt32(),
+            OptionalString(element, "countParameterId"),
+            Required(element, "minimumCount").GetInt32(),
+            Required(element, "maximumCount").GetInt32(),
+            ParseEnum<AssetGeometryAxis>(
+                Required(element, "axis"),
+                "axis"),
+            ParseEnum<AssetGeometryRepeatPattern>(
+                Required(element, "pattern"),
+                "pattern"),
+            Required(element, "spacing").GetDouble());
+    }
+
+    private static IEnumerable<AssetGeometryParameterBinding> ParseBindings(
+        JsonElement array)
+    {
+        foreach (var element in array.EnumerateArray())
+        {
+            yield return new AssetGeometryParameterBinding(
+                Required(element, "component").GetInt32(),
+                RequiredString(element, "parameterId"),
+                Required(element, "multiplier").GetDouble(),
+                Required(element, "offset").GetDouble());
+        }
+    }
+
+    private static void WriteGeometry(
+        Utf8JsonWriter writer,
+        AssetGeometryDefinition geometry)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("geometryId", geometry.GeometryId);
+        writer.WriteString("primitive", geometry.Primitive.ToString());
+        WriteVector(writer, "size", geometry.Size);
+        WriteVector(writer, "position", geometry.Position);
+        WriteVector(writer, "rotationDegrees", geometry.RotationDegrees);
+        writer.WriteNumber("segments", geometry.Segments);
+        writer.WriteStartArray("sizeBindings");
+        foreach (var binding in geometry.SizeBindings)
+        {
+            WriteBinding(writer, binding);
+        }
+
+        writer.WriteEndArray();
+        writer.WriteStartArray("positionBindings");
+        foreach (var binding in geometry.PositionBindings)
+        {
+            WriteBinding(writer, binding);
+        }
+
+        writer.WriteEndArray();
+        if (geometry.Repeat is { } repeat)
+        {
+            writer.WritePropertyName("repeat");
+            writer.WriteStartObject();
+            writer.WriteNumber("fixedCount", repeat.FixedCount);
+            writer.WriteString("countParameterId", repeat.CountParameterId);
+            writer.WriteNumber("minimumCount", repeat.MinimumCount);
+            writer.WriteNumber("maximumCount", repeat.MaximumCount);
+            writer.WriteString("axis", repeat.Axis.ToString());
+            writer.WriteString("pattern", repeat.Pattern.ToString());
+            writer.WriteNumber("spacing", repeat.Spacing);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteString("textParameterId", geometry.TextParameterId);
+        writer.WriteString(
+            "textSpacingParameterId",
+            geometry.TextSpacingParameterId);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteBinding(
+        Utf8JsonWriter writer,
+        AssetGeometryParameterBinding binding)
+    {
+        writer.WriteStartObject();
+        writer.WriteNumber("component", binding.Component);
+        writer.WriteString("parameterId", binding.ParameterId);
+        writer.WriteNumber("multiplier", binding.Multiplier);
+        writer.WriteNumber("offset", binding.Offset);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteVector(
+        Utf8JsonWriter writer,
+        string name,
+        IEnumerable<double> values)
+    {
+        writer.WriteStartArray(name);
+        foreach (var value in values)
+        {
+            writer.WriteNumberValue(value);
+        }
+
+        writer.WriteEndArray();
     }
 
     private static IEnumerable<AssetMaterialSlot> ParseSlots(
@@ -200,6 +367,18 @@ public static class AssetRecipeSerializer
                 ParseEditor(OptionalObject(element, "editor")),
                 Required(element, "isInstanceEditable").GetBoolean(),
                 ParseTarget(element));
+        }
+    }
+
+    private static IEnumerable<VisualDependencyFingerprint> ParseDependencies(
+        JsonElement array)
+    {
+        foreach (var element in array.EnumerateArray())
+        {
+            yield return new VisualDependencyFingerprint(
+                RequiredString(element, "id"),
+                RequiredString(element, "algorithm"),
+                RequiredString(element, "fingerprint"));
         }
     }
 

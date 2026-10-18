@@ -27,6 +27,7 @@ public static class MaterialGraphSerializer
 
             writer.WriteEndArray();
             writer.WriteString("materialId", graph.MaterialId);
+            writer.WriteNumber("moduleVersion", graph.ModuleVersion);
             writer.WriteStartArray("parameters");
             foreach (var parameter in graph.Parameters)
             {
@@ -42,6 +43,17 @@ public static class MaterialGraphSerializer
             }
 
             writer.WriteNumber("schemaVersion", CurrentSchemaVersion);
+            writer.WriteStartArray("dependencies");
+            foreach (var dependency in graph.Dependencies)
+            {
+                writer.WriteStartObject();
+                writer.WriteString("algorithm", dependency.Algorithm);
+                writer.WriteString("fingerprint", dependency.Fingerprint);
+                writer.WriteString("id", dependency.Id);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
             writer.WriteStartArray("tags");
             foreach (var tag in graph.Tags)
             {
@@ -88,7 +100,11 @@ public static class MaterialGraphSerializer
             ParseLayers(OptionalArray(root, "layers")),
             OptionalArray(root, "tags")
                 .EnumerateArray()
-                .Select(element => element.GetString() ?? string.Empty));
+                .Select(element => element.GetString() ?? string.Empty),
+            root.TryGetProperty("moduleVersion", out var moduleVersion)
+                ? moduleVersion.GetInt32()
+                : 1,
+            ParseDependencies(OptionalArray(root, "dependencies")));
     }
 
     public static string SerializeInstance(MaterialInstance instance)
@@ -289,6 +305,18 @@ public static class MaterialGraphSerializer
                 Required(element, "isAnimatable").GetBoolean(),
                 Required(element, "isInstanceEditable").GetBoolean(),
                 ParseTarget(element));
+        }
+    }
+
+    private static IEnumerable<VisualDependencyFingerprint> ParseDependencies(
+        JsonElement array)
+    {
+        foreach (var element in array.EnumerateArray())
+        {
+            yield return new VisualDependencyFingerprint(
+                RequiredString(element, "id"),
+                RequiredString(element, "algorithm"),
+                RequiredString(element, "fingerprint"));
         }
     }
 

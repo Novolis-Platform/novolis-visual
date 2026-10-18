@@ -9,9 +9,6 @@
     <Project Path="src/Novolis.Visual.Evaluation/Novolis.Visual.Evaluation.csproj" />
     <Project Path="src/Novolis.Visual.Baking/Novolis.Visual.Baking.csproj" />
     <Project Path="src/Novolis.Visual.CodeGen/Novolis.Visual.CodeGen.csproj" />
-    <Project Path="src/Novolis.AssetStudio.Core/Novolis.AssetStudio.Core.csproj" />
-    <Project Path="src/Novolis.AssetStudio.Import/Novolis.AssetStudio.Import.csproj" />
-    <Project Path="src/Novolis.AssetStudio.Export/Novolis.AssetStudio.Export.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Novolis.Visual.Definitions.Unit/Novolis.Visual.Definitions.Unit.csproj" />
@@ -21,7 +18,6 @@
     <Project Path="tests/Novolis.Visual.Baking.Unit/Novolis.Visual.Baking.Unit.csproj" />
     <Project Path="tests/Novolis.Visual.CodeGen.Unit/Novolis.Visual.CodeGen.Unit.csproj" />
     <Project Path="tests/Novolis.Visual.GeneratedConsumer/Novolis.Visual.GeneratedConsumer.csproj" />
-    <Project Path="tests/Novolis.AssetStudio.Unit/Novolis.AssetStudio.Unit.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Build.props" />

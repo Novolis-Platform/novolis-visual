@@ -15,13 +15,20 @@ public sealed record MaterialGraph
         IEnumerable<MaterialChannelBinding>? channels = null,
         IEnumerable<MaterialParameterDefinition>? parameters = null,
         IEnumerable<MaterialLayer>? layers = null,
-        IEnumerable<string>? tags = null)
+        IEnumerable<string>? tags = null,
+        int moduleVersion = 1,
+        IEnumerable<VisualDependencyFingerprint>? dependencies = null)
     {
         MaterialId = Required(materialId, nameof(materialId));
         DisplayName = Required(displayName, nameof(displayName));
         ArgumentNullException.ThrowIfNull(recipe);
+        if (moduleVersion < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(moduleVersion));
+        }
 
         Recipe = recipe;
+        ModuleVersion = moduleVersion;
         Channels = (channels ?? [])
             .OrderBy(binding => binding.Channel)
             .ToImmutableArray();
@@ -38,6 +45,14 @@ public sealed record MaterialGraph
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
             .ToImmutableArray();
+        Dependencies = (dependencies ?? [])
+            .Select(dependency =>
+            {
+                ArgumentNullException.ThrowIfNull(dependency);
+                return dependency;
+            })
+            .OrderBy(dependency => dependency.Id, StringComparer.Ordinal)
+            .ToImmutableArray();
 
         EnsureUnique(
             Channels.Select(binding => binding.Channel),
@@ -48,6 +63,9 @@ public sealed record MaterialGraph
         EnsureUnique(
             Layers.Select(layer => layer.Id),
             "material layer");
+        EnsureUnique(
+            Dependencies.Select(dependency => dependency.Id),
+            "material dependency");
     }
 
     public string MaterialId { get; }
@@ -56,6 +74,10 @@ public sealed record MaterialGraph
 
     public VisualRecipe Recipe { get; }
 
+    public int ModuleVersion { get; }
+
+    public ImmutableArray<VisualDependencyFingerprint> Dependencies { get; }
+
     public ImmutableArray<MaterialChannelBinding> Channels { get; }
 
     public ImmutableArray<MaterialParameterDefinition> Parameters { get; }
@@ -63,6 +85,16 @@ public sealed record MaterialGraph
     public ImmutableArray<MaterialLayer> Layers { get; }
 
     public ImmutableArray<string> Tags { get; }
+
+    /// <summary>
+    /// Stable fingerprint of the complete reusable material module.
+    /// </summary>
+    public string Fingerprint =>
+        Convert.ToHexString(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(
+                        MaterialGraphSerializer.Serialize(this))))
+            .ToLowerInvariant();
 
     public MaterialParameterDefinition? FindParameter(string id) =>
         Parameters.FirstOrDefault(

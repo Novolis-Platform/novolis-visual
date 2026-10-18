@@ -1,4 +1,4 @@
-# Visual and Asset Studio dependency matrix
+# Visual dependency matrix
 
 This matrix is the review checklist for package references and architectural
 boundary verification.
@@ -13,12 +13,6 @@ boundary verification.
 | `Novolis.Visual.Baking` | Visual Evaluation, Math, approved image/mesh contracts | Avalonia, Silk.NET, arbitrary process execution |
 | `Novolis.Visual.CodeGen` | Visual Compile, CodeGen Pipeline/Roslyn tooling | editor UI, runtime Roslyn, Silk.NET |
 | `Novolis.Visual.Adapters.Rendering` | Visual packages, Modeling.Scene, Rendering packages | Avalonia, Silk.NET, WorkflowEngine execution |
-| `Novolis.AssetStudio.Core` | Visual packages, Workspaces, Timeline, snapshots | Avalonia, Silk.NET, GPU handles |
-| `Novolis.AssetStudio.Import` | AssetStudio Core, Visual, Modeling import contracts, approved codecs | shell execution, unrestricted file access |
-| `Novolis.AssetStudio.Export` | AssetStudio Core, Visual CodeGen/Baking, CodeGen Pipeline | Avalonia, Silk.NET, runtime editor dependencies |
-| `Novolis.Avalonia.AssetStudio` | AssetStudio Core, Visual, Avalonia, Graphical Profile | Silk.NET direct use unless it is an explicit host adapter |
-| `novolis-tools` AssetStudio command | AssetStudio Core/Export, CLI infrastructure | Avalonia, window creation, required GPU context |
-| `novolis-apps` AssetStudio host | Visual, AssetStudio, Avalonia, selected Rendering/Silk host adapters | generated consumer runtime assumptions |
 | `Novolis.Rendering.*` | Math and lower rendering packages | Visual authoring, WorkflowEngine execution, Avalonia, Silk.NET |
 | `Novolis.Silk.*` | Math/BCL and Silk.NET | Rendering scene/material packages, Simulation |
 

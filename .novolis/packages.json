@@ -17,15 +17,6 @@
     },
     "Novolis.Visual.Adapters.Rendering": {
       "description": "Truthful adapters from VisualIR and feature values to Modeling, Rendering, and FrameGraph contracts."
-    },
-    "Novolis.AssetStudio.Core": {
-      "description": "Host-neutral Asset Studio documents, sessions, commands, previews, and diagnostics."
-    },
-    "Novolis.AssetStudio.Import": {
-      "description": "Bounded recipe and PNG, JPEG, and WebP image import."
-    },
-    "Novolis.AssetStudio.Export": {
-      "description": "Definition, code-only, packed, bake, documentation, and build exports."
     }
   }
 }

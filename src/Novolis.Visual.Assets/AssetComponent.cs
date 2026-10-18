@@ -12,7 +12,8 @@ public sealed record AssetComponent
         string name,
         AssetComponentKind kind,
         VisualPortReference source,
-        string? materialSlotId = null)
+        string? materialSlotId = null,
+        AssetGeometryDefinition? geometry = null)
     {
         Id = Required(id, nameof(id));
         Name = Required(name, nameof(name));
@@ -30,6 +31,7 @@ public sealed record AssetComponent
         MaterialSlotId = string.IsNullOrWhiteSpace(materialSlotId)
             ? null
             : materialSlotId.Trim();
+        Geometry = geometry;
     }
 
     public string Id { get; }
@@ -41,6 +43,13 @@ public sealed record AssetComponent
     public VisualPortReference Source { get; }
 
     public string? MaterialSlotId { get; }
+
+    /// <summary>
+    /// Optional portable geometry metadata for geometry components. The
+    /// metadata is consumed by a Modeling adapter; it is not a renderer or
+    /// host-specific scene object.
+    /// </summary>
+    public AssetGeometryDefinition? Geometry { get; }
 
     private static string Required(string value, string name)
     {

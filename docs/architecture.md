@@ -1,9 +1,10 @@
-# Novolis Visual and Asset Studio architecture
+# Novolis Visual architecture
 
 Status: accepted implementation baseline
 
-This repository owns host-neutral visual authoring, compilation, baking, code
-generation, and Asset Studio headless services. It does not own Avalonia,
+This repository owns host-neutral visual contracts, compilation, baking, code
+generation, and rendering adapters. It does not own AssetStudio
+implementation services, Avalonia,
 Silk.NET, a window, a GPU context, or a second scene hierarchy.
 
 ## Existing authorities
@@ -36,14 +37,11 @@ The first stable projects are:
 - `Novolis.Visual.Baking`
 - `Novolis.Visual.CodeGen`
 - `Novolis.Visual.Adapters.Rendering`
-- `Novolis.AssetStudio.Core`
-- `Novolis.AssetStudio.Import`
-- `Novolis.AssetStudio.Export`
 
-The Avalonia editor is owned by `Novolis.Avalonia.AssetStudio` or the product
-host after a second consumer proves that extraction is worthwhile. The
-PackAsTool command is owned by `novolis-tools`; the product host is owned by
-`novolis-apps`.
+AssetStudio authoring, import, export, and the PackAsTool command are owned by
+the AssetStudio implementation in `novolis-tools`; the product host is owned
+by `novolis-apps`. `Novolis.Avalonia.AssetStudio` is only the reusable chrome
+and adapter surface.
 
 ## Dependency rules
 

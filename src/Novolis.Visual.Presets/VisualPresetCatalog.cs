@@ -124,7 +124,34 @@ public sealed class VisualPresetCatalog
                     "blade",
                     "Blade",
                     "geometry.lightsaber.blade",
-                    "blade"),
+                    "blade",
+                    new AssetGeometryDefinition(
+                        "geometry.lightsaber.blade",
+                        AssetGeometryPrimitive.Capsule,
+                        size: [0.16, 3.2, 0.16],
+                        position: [0, 1.6, 0],
+                        segments: 32,
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                0,
+                                "blade.radius",
+                                multiplier: 2),
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "blade.length"),
+                            new AssetGeometryParameterBinding(
+                                2,
+                                "blade.radius",
+                                multiplier: 2),
+                        ],
+                        positionBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "blade.length",
+                                multiplier: 0.5),
+                        ])),
             ],
             [new AssetMaterialSlot(
                 "blade",
@@ -207,12 +234,42 @@ public sealed class VisualPresetCatalog
                     "lettering",
                     "Lettering",
                     "geometry.text.extruded",
-                    "tube"),
+                    "tube",
+                    new AssetGeometryDefinition(
+                        "geometry.text.extruded",
+                        AssetGeometryPrimitive.Text,
+                        size: [0.08, 1.5, 0.08],
+                        position: [0, 1.5, 0],
+                        segments: 16,
+                        textParameterId: "sign.text",
+                        textSpacingParameterId: "sign.spacing",
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "sign.size"),
+                        ])),
                 new AssetPart(
                     "backing",
                     "Backing",
                     "geometry.sign.backing",
-                    "backing"),
+                    "backing",
+                    new AssetGeometryDefinition(
+                        "geometry.sign.backing",
+                        AssetGeometryPrimitive.Box,
+                        size: [4, 0.24, 2.4],
+                        position: [0, 1.5, 0],
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                0,
+                                "sign.size",
+                                multiplier: 2.2),
+                            new AssetGeometryParameterBinding(
+                                2,
+                                "sign.size",
+                                multiplier: 1.35),
+                        ])),
             ],
             [
                 new AssetMaterialSlot(
@@ -318,7 +375,19 @@ public sealed class VisualPresetCatalog
                     "pane",
                     "Sample Pane",
                     "geometry.glass.pane",
-                    "glass"),
+                    "glass",
+                    new AssetGeometryDefinition(
+                        "geometry.glass.pane",
+                        AssetGeometryPrimitive.Box,
+                        size: [2, 0.02, 2.8],
+                        position: [0, 1.4, 0],
+                        segments: 16,
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "glass.thickness"),
+                        ])),
             ],
             [new AssetMaterialSlot(
                 "glass",
@@ -422,22 +491,114 @@ public sealed class VisualPresetCatalog
                     "fuselage",
                     "Fuselage",
                     "geometry.rocket.fuselage",
-                    "paint"),
+                    "paint",
+                    new AssetGeometryDefinition(
+                        "geometry.rocket.fuselage",
+                        AssetGeometryPrimitive.Capsule,
+                        size: [2.4, 18, 2.4],
+                        position: [0, 9, 0],
+                        segments: 32,
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                0,
+                                "rocket.bodyDiameter"),
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "rocket.bodyLength"),
+                            new AssetGeometryParameterBinding(
+                                2,
+                                "rocket.bodyDiameter"),
+                        ],
+                        positionBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "rocket.bodyLength",
+                                multiplier: 0.5),
+                        ])),
+                new AssetPart(
+                    "nose",
+                    "Nose",
+                    "geometry.rocket.nose",
+                    "paint",
+                    new AssetGeometryDefinition(
+                        "geometry.rocket.nose",
+                        AssetGeometryPrimitive.Cone,
+                        size: [2.4, 2.4, 2.4],
+                        position: [0, 1.2, 0],
+                        segments: 32,
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                0,
+                                "rocket.bodyDiameter"),
+                            new AssetGeometryParameterBinding(
+                                2,
+                                "rocket.bodyDiameter"),
+                        ],
+                        positionBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                1,
+                                "rocket.bodyLength",
+                                multiplier: 0.5,
+                                offset: 1.2),
+                        ])),
                 new AssetPart(
                     "fins",
                     "Fins",
                     "geometry.rocket.fins",
-                    "paint"),
+                    "paint",
+                    new AssetGeometryDefinition(
+                        "geometry.rocket.fins",
+                        AssetGeometryPrimitive.Box,
+                        size: [1.4, 4, 0.24],
+                        position: [1.2, 2, 0],
+                        sizeBindings:
+                        [
+                            new AssetGeometryParameterBinding(
+                                0,
+                                "rocket.finSize"),
+                        ],
+                        repeat: new AssetGeometryRepeat(
+                            fixedCount: 4,
+                            axis: AssetGeometryAxis.Y,
+                            pattern: AssetGeometryRepeatPattern.Radial))),
                 new AssetPart(
                     "engines",
                     "Engine Cluster",
                     "geometry.rocket.engines",
-                    "engine"),
+                    "engine",
+                    new AssetGeometryDefinition(
+                        "geometry.rocket.engines",
+                        AssetGeometryPrimitive.Cylinder,
+                        size: [0.5, 0.8, 0.5],
+                        position: [0, 0, 0],
+                        segments: 24,
+                        repeat: new AssetGeometryRepeat(
+                            countParameterId: "rocket.engineCount",
+                            minimumCount: 1,
+                            maximumCount: 13,
+                            axis: AssetGeometryAxis.Y,
+                            pattern: AssetGeometryRepeatPattern.Radial,
+                            spacing: 0.65))),
                 new AssetPart(
                     "windows",
                     "Windows",
                     "geometry.rocket.windows",
-                    "window"),
+                    "window",
+                    new AssetGeometryDefinition(
+                        "geometry.rocket.windows",
+                        AssetGeometryPrimitive.Sphere,
+                        size: [0.42, 0.18, 0.42],
+                        position: [0, 6.8, 1.15],
+                        segments: 20,
+                        repeat: new AssetGeometryRepeat(
+                            fixedCount: 5,
+                            axis: AssetGeometryAxis.Y,
+                            pattern: AssetGeometryRepeatPattern.Linear,
+                            spacing: 1.35))),
             ],
             [
                 new AssetMaterialSlot(
@@ -725,7 +886,8 @@ public sealed class VisualPresetCatalog
                     part.Id,
                     part.Name,
                     AssetComponentKind.Geometry,
-                    source));
+                    source,
+                    geometry: part.Geometry));
             components.Add(
                 new AssetComponent(
                     part.Id + ".material",
@@ -789,7 +951,8 @@ public sealed class VisualPresetCatalog
         string Id,
         string Name,
         string GeometryId,
-        string MaterialSlotId);
+        string MaterialSlotId,
+        AssetGeometryDefinition Geometry);
 
     private sealed record AssetFeature(
         string Id,
